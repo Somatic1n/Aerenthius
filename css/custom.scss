@@ -791,3 +791,8 @@ body {
   scrollbar-width: thin;
   scrollbar-color: #5a4632 transparent; // thumb, track
 }
+
+.leaf__content img {
+  display: block;
+  margin-inline: auto;
+}

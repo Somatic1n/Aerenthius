@@ -51,7 +51,7 @@ fs.readdirSync(folder, { recursive: true }).forEach((file) => {
 
 
   note = note.replace(/!\[\[([^\]|]+?\.(?:png|jpe?g|webp|gif))(?:\|(\d+))?\]\]/gi, (match, filename, width) =>{
-    return `<img src="images/lore/${encodeURIComponent(filename)}" alt="${filename}" ${width ? `width="${width}"` : ""}>`;
+    return `<img src="images/lore/${encodeURIComponent(filename)}" alt="${filename}" class="center" ${width ? `width="${width}"` : ""}>`;
 
   });
 

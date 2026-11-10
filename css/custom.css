@@ -12925,4 +12925,9 @@ body {
   padding-right: 0.75em;
   scrollbar-width: thin;
   scrollbar-color: #5a4632 transparent;
+}
+
+.leaf__content img {
+  display: block;
+  margin-inline: auto;
 }/*# sourceMappingURL=custom.css.map */
