@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="css/custom.css" />
+
+<style>
+
+body::before {
+  display: none;
+}
+
+
+body{
+    background: url("images/textures/Space.webp");
+    background-size: cover;
+}
+
+.container {
+  width: 200px;
+  height: 200px;
+  margin: 100px auto;
+  perspective: 600px;
+}
+
+.cube {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  animation: spin 30s infinite linear;
+
+  /* Book dimensions — change these and every face updates */
+  --t: 50px;     /* thickness */
+  --h: 300px;    /* height */
+  --d: 200px;    /* depth (cover width) */
+  --inset: 5px;  /* how far the pages sit inside the covers */
+}
+
+.face {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;  /* every face's center = the book's center */
+  line-height: 50px;
+  text-align: center;
+  font-size: 16px;
+  font-weight: bold;
+  background: url("images/textures/leather-dark.jpg");
+}
+.corner {
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
+  width: clamp(60px, 12vmin, 210px);
+  background-image: url("../images/textures/corner-clean.webp");
+  background-size: 35% 35%;
+  background-repeat: no-repeat;
+  aspect-ratio: 270 / 292;
+  --corner-size: clamp(60px, 12vmin, 210px);
+  width: var(--corner-size);
+}
+
+.corner-tl {
+  top: calc(var(--corner-size) * -0.04);
+  left: calc(var(--corner-size) * -0.65);
+  transform: scaleX(-1);
+}
+.corner-tr {
+  top: calc(var(--corner-size) * -0.04);
+  right: calc(var(--corner-size) * -0.65);
+}
+.corner-bl {
+  bottom: calc(var(--corner-size) * -0.04);
+  left: calc(var(--corner-size) * -.65);
+  transform: scale(-1);
+}
+.corner-br {
+  bottom: calc(var(--corner-size) * -0.04);
+  right: calc(var(--corner-size) * -0.65);
+  transform: scaleY(-1);
+}
+
+/* Covers */
+.left   { width: var(--d); height: var(--h);
+          transform: rotateY(-90deg) translateZ(calc(var(--t) / 2)); 
+        outline: 2px solid #ffc400; outline-offset: -15px;}
+.right  { width: var(--d); height: var(--h);
+          transform: rotateY(90deg) translateZ(calc(var(--t) / 2)); 
+          outline: 2px solid #ffc400; outline-offset: -15px;
+        }
+
+/* Spine */
+.back   { width: var(--t); height: var(--h);
+          transform: rotateY(180deg) translateZ(calc(var(--d) / 2)); }
+
+/* Pages — shrunk by the inset so they sit inside the covers */
+.front  { width: var(--t); height: calc(var(--h) - 2 * var(--inset));
+          transform: translateZ(calc(var(--d) / 2 - var(--inset)));
+          background: repeating-linear-gradient(
+            to right, rgba(0,0,0,0.12) 0 1px,
+            transparent 1px 3px
+          ), url("images/textures/paper-light.jpg"); 
+          
+        }
+
+.top    { width: var(--t); height: calc(var(--d) - var(--inset));
+          transform: translateZ(calc(var(--inset) / -2))
+                     rotateX(90deg) translateZ(calc(var(--h) / 2 - var(--inset)));
+          background: repeating-linear-gradient(
+            to right, rgba(0,0,0,0.12) 0 1px,
+            transparent 1px 3px
+          ),url("images/textures/paper-light.jpg"); }
+.bottom { width: var(--t); height: calc(var(--d) - var(--inset));
+          transform: translateZ(calc(var(--inset) / -2))
+                     rotateX(-90deg) translateZ(calc(var(--h) / 2 - var(--inset)));
+          background: repeating-linear-gradient(
+            to right, rgba(0,0,0,0.12) 0 1px,
+            transparent 1px 3px
+          ),url("images/textures/paper-light.jpg"); }
+
+@keyframes spin {
+  from { transform: rotateX(0deg) rotateY(0deg); } 
+  to   { transform: rotateX(360deg) rotateY(360deg); } 
+
+
+}
+body {
+  margin: 0;
+  min-height: 100vh;    /* at least as tall as the browser window */
+  display: grid;
+  place-items: center;  /* center horizontally and vertically */
+}
+
+.open-book > .page-stack {
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.page-stack span:nth-child(1) {
+  inset: 0 -18px 0 -18px;
+  filter: brightness(0.84);
+}
+.page-stack span:nth-child(2) {
+  inset: 0 -15px 0 -15px;
+  filter: brightness(0.87);
+}
+.page-stack span:nth-child(3) {
+  inset: 0 -12px 0 -12px;
+  filter: brightness(0.9);
+}
+.page-stack span:nth-child(4) {
+  inset: 0 -9px 0 -9px;
+  filter: brightness(0.93);
+}
+.page-stack span:nth-child(5) {
+  inset: 0 -6px 0 -6px;
+  filter: brightness(0.96);
+}
+.page-stack span:nth-child(6) {
+  inset: 0 -3px 0 -3px;
+} 
+
+
+.page-stack span {
+  position: absolute;
+  
+  box-shadow: 0 0 1px rgba(0, 0, 0, 0.55);
+}
+
+
+
+</style>
+<title> Aerenthius</title>
+</head>
+<body>
+
+<a href="index.html">
+<div class="container">
+  <div class="cube">
+    <div class="face front"></div>
+    <div class="face back"></div>
+    <div class="face right text-white">
+        <div class="corner corner-tl"> </div>
+        <div class="corner corner-bl"> </div> 
+     </div>
+    <div class="face left text-white">
+       <br> Aerenthius:<br> A Brief <br> History
+        <div class="corner corner-tr"> </div>
+        <div class="corner corner-br"> </div>
+    </div>
+    <div class="face top page-stack"></div>
+    <div class="face bottom page-stack"></div>
+  </div>
+</div>
+</a>
+
+</body>
+</html>

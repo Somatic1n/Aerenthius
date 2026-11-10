@@ -1,0 +1,19 @@
+# npm packages (reinstall with `npm install`)
+node_modules/
+
+# Full-size source textures (web-ready copies are in images/textures/)
+textures-source/
+
+# Downloaded template archives
+*.zip
+
+# All of the lore
+Lore/
+tester.html
+
+#staticrypt
+build/
+.env
+
+#template
+template.html

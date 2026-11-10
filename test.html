@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lore Site</title>
+    <link rel="stylesheet" href="css/custom.css" />
+  </head>
+  <body>
+    <div class="corner corner-tl" aria-hidden="true"></div>
+    <div class="corner corner-tr" aria-hidden="true"></div>
+    <div class="corner corner-bl" aria-hidden="true"></div>
+    <div class="corner corner-br" aria-hidden="true"></div>
+
+    <section
+      class="open-book"
+      aria-label="Lore book"
+      aria-roledescription="book"
+    >
+      <div class="page-stack" aria-hidden="true">
+        <span></span><span></span><span></span><span></span><span></span
+        ><span></span>
+      </div>
+
+      <header></header>
+      <div class="container">
+        <div class="book">
+          <div class="leaf">
+            <article class="leaf__face leaf__face--front">
+              <div class="leaf__content">
+                <h2 data-entry="toc" class="contents-title">Table of Contents</h2>
+                <!--Start of the TOC-->
+
+
+<!--End of the TOC-->
+
+
+
+              </div>
+            </article>
+            <article class="leaf__face leaf__face--back">
+              <div class="leaf__content">
+              </div>
+            </article>
+          </div>
+
+          <!--Start of the leafs-->
+
+
+<!--End of the leafs-->
+
+          
+          </div>
+        </div>
+      </div>
+
+      <template id="wand-next">
+        <button
+          type="button"
+          class="btn wand-button wand-button-right"
+          aria-label="Next page"
+        >
+          <img
+            class="wand"
+            src="images/textures/Wand.webp"
+            width="1507"
+            height="122"
+            alt=""
+          />
+          <img
+            class="spell spell-right"
+            src="images/textures/Spell.webp"
+            width="319"
+            height="340"
+            alt=""
+          />
+        </button>
+      </template>
+
+      <template id="wand-prev">
+        <button
+          type="button"
+          class="btn wand-button wand-button-left"
+          aria-label="previous page"
+        >
+          <img
+            class="wand"
+            src="images/textures/Wand.webp"
+            width="1507"
+            height="122"
+            alt=""
+          />
+          <img
+            class="spell spell-left"
+            src="images/textures/Spell.webp"
+            width="319"
+            height="340"
+            alt=""
+          />
+        </button>
+      </template>
+
+      <footer></footer>
+    </section>
+    <!-- announces page changes to screen readers; visually hidden -->
+    <p
+      id="page-status"
+      class="visually-hidden"
+      role="status"
+      aria-live="polite"
+    ></p>
+
+    <script>
+      // turn (or un-turn) leaves until exactly `target` of them are turned
+
+      function fitLeaves() {
+        const book = document.querySelector(".book");
+        const half = book.clientWidth / 2; // how wide a page should LOOK
+        const P = 2000; // must match .container's perspective
+        const tilt = (6 * Math.PI) / 180; // 6deg in radians (Math.cos/sin use radians)
+        const width = (half * P) / (P * Math.cos(tilt) - half * Math.sin(tilt));
+        book.style.setProperty("--leaf-width", width + "px");
+      }
+      fitLeaves();
+      addEventListener("resize", fitLeaves); // recalculate when the window changes size
+
+      const leaves = document.querySelectorAll(".leaf");
+      let turned = 0;
+
+      // ---- accessibility -------------------------------------------------
+      // Every page lives in the DOM at once, so without help a keyboard user
+      // tabs through wands on pages they cannot see and a screen reader reads
+      // the whole book in one go. `inert` takes an element and its contents out
+      // of the tab order, out of click handling and out of the a11y tree.
+      const pageStatus = document.querySelector("#page-status");
+
+      // the two faces actually on show: the back of the last turned leaf (left)
+      // and the front of the next unturned one (right). either can be absent at
+      // the very start or the very end of the book.
+      function visibleFaces() {
+        return {
+          left:
+            turned > 0
+              ? leaves[turned - 1].querySelector(".leaf__face--back")
+              : null,
+          right:
+            turned < leaves.length
+              ? leaves[turned].querySelector(".leaf__face--front")
+              : null,
+        };
+      }
+
+      function updateInert() {
+        const { left, right } = visibleFaces();
+        leaves.forEach((leaf) => {
+          leaf.querySelectorAll(".leaf__face").forEach((face) => {
+            face.inert = face !== left && face !== right;
+          });
+        });
+      }
+
+      // a page turn is silent to a screen reader, so say what we moved to.
+      function announcePage() {
+        const { left, right } = visibleFaces();
+        const name = (face) => {
+          const h = face && face.querySelector("h2");
+          return h ? h.textContent.trim() : null;
+        };
+        const parts = [name(left), name(right)].filter(Boolean);
+        pageStatus.textContent = parts.length
+          ? "Showing " + parts.join(" and ")
+          : "End of the book";
+      }
+
+      // turning a page makes the wand that was just clicked inert, which drops
+      // focus to <body>. put it back on the matching wand of the new spread so
+      // a keyboard reader can keep going without re-tabbing from the top.
+      function refocusWand(oldButton) {
+        if (document.activeElement && document.activeElement !== document.body)
+          return;
+        const goingRight = oldButton.classList.contains("wand-button-right");
+        const faces = visibleFaces();
+        const face = goingRight ? faces.right : faces.left;
+        const wand =
+          face &&
+          face.querySelector(
+            goingRight ? ".wand-button-right" : ".wand-button-left",
+          );
+        if (wand) wand.focus();
+      }
+
+      function updateStacking() {
+        leaves.forEach((leaf, index) => {
+          if (leaf.classList.contains("is-flipped")) {
+            leaf.style.zIndex = index + 1; // later turned = higher
+          } else {
+            leaf.style.zIndex = leaves.length - index; // earlier unturned = higher
+          }
+        });
+        updateInert();
+        announcePage();
+      }
+      // readers who have asked their OS for less motion. checked live (not
+      // stored) so it still works if they change the setting with the page open.
+      const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
+
+      function castSpell(button, action) {
+        const spell = button.querySelector(".spell");
+        if (spell.classList.contains("casting")) return;
+
+        const finish = () => {
+          spell.classList.remove("casting");
+          action(); // next() or previous()
+          updateAddress();
+          refocusWand(button);
+        };
+
+        // with the animation off, "animationend" never fires -- waiting for it
+        // would leave the wands dead, so just do the work now.
+        if (reduceMotion.matches) return finish();
+
+        spell.classList.add("casting");
+        spell.addEventListener("animationend", finish, { once: true });
+      }
+
+      document.querySelector(".book").addEventListener("click", (e) => {
+        const wand = e.target.closest(".wand-button");
+        if (!wand) return;
+        castSpell(
+          wand,
+          wand.classList.contains("wand-button-right") ? next : previous,
+        );
+      });
+
+      function turnPage(leaf) {
+        updateStacking();
+        leaf.style.zIndex = leaves.length + 1;
+      }
+
+      function next() {
+        if (turned < leaves.length) {
+          // is there a page left to turn?
+          const leaf = leaves[turned];
+          leaf.classList.add("is-flipped");
+          turned++;
+          turnPage(leaf);
+        }
+      }
+
+      function previous() {
+        if (turned > 0) {
+          // is there a page to turn back?
+          turned--;
+          const leaf = leaves[turned];
+          leaf.classList.remove("is-flipped");
+          turnPage(leaf);
+        }
+      }
+
+      const nextWand = document.querySelector("#wand-next");
+      const prevWand = document.querySelector("#wand-prev");
+
+      leaves.forEach((leaf) => {
+        // every front (right page) gets "next" -- turning the last leaf still
+        // reveals its own back, so it needs one too
+        leaf
+          .querySelector(".leaf__face--front")
+          .append(nextWand.content.cloneNode(true));
+        // every back (left page) gets "previous"
+        leaf
+          .querySelector(".leaf__face--back")
+          .append(prevWand.content.cloneNode(true));
+      });
+
+      // turn (or un-turn) leaves until exactly `target` of them are turned.
+      // the pages riffle one after another instead of moving as one block,
+      // and the stacking only changes once they've all landed -- restacking
+      // while a page is still lying flat makes the page under it flash on top.
+      function goTo(target) {
+        // no stagger when motion is reduced -- the pages just change
+        const step = reduceMotion.matches ? 0 : 0.12; // seconds between turns
+
+        // which leaves need to change sides?
+        const moving = [];
+        leaves.forEach((leaf, index) => {
+          const shouldBeTurned = index < target;
+          if (leaf.classList.contains("is-flipped") !== shouldBeTurned) {
+            moving.push(leaf);
+          }
+        });
+        // going back, the top page on the left pile has to move first
+        if (target < turned) moving.reverse();
+        turned = target;
+        if (moving.length === 0) return updateStacking();
+
+        moving.forEach((leaf, i) => {
+          leaf.style.transitionDelay = i * step + "s";
+          leaf.classList.toggle("is-flipped");
+        });
+
+        // 1s = the .leaf transition in custom.scss (0 when motion is reduced,
+        // because the transition is switched off and nothing has to be waited for)
+        const total = reduceMotion.matches ? 0 : (moving.length - 1) * step + 1;
+        setTimeout(() => {
+          moving.forEach((leaf) => (leaf.style.transitionDelay = ""));
+          updateStacking(); // LEAVE THIS LAST. LANDMINE
+        }, total * 1000);
+      }
+
+      function goToHash() {
+        if (!location.hash) return goTo(0); // no hash = the start of the book
+        const el = document.querySelector(
+          `[data-entry="${location.hash.slice(1)}"]`,
+        );
+        if (!el) return; // no element with that id
+        const leaf = el.closest(".leaf");
+        const index = [...leaves].indexOf(leaf);
+        // a right page (front) needs the leaves BEFORE it turned;
+        // a left page (back) needs its own leaf turned too
+        goTo(el.closest(".leaf__face--back") ? index + 1 : index);
+      }
+
+      addEventListener("hashchange", goToHash); // a TOC link (or the back button) was used
+      //history.replaceState(null, "", location.pathname); // remove #gods from the address
+      goToHash(); // start at the contents page
+      // the page was opened with a hash, e.g. index.html#gods
+
+      function updateAddress() {
+        const leaf = leaves[turned];
+
+        if (leaf == undefined) {
+          return;
+        }
+        const leave = leaf.querySelector("[data-entry]");
+        if (leave == null) {
+          return;
+        }
+
+        location.hash = leave.dataset.entry;
+      }
+
+      document.body.addEventListener("keydown", function (event) {
+        const key = event.key;
+        switch (key) {
+          case "ArrowLeft":
+            previous();
+            updateAddress();
+            break;
+          case "ArrowRight":
+            next();
+            updateAddress();
+            break;
+        }
+      });
+      updateStacking();
+    </script>
+  </body>
+</html>
