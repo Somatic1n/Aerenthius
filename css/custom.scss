@@ -795,4 +795,6 @@ body {
 .leaf__content img {
   display: block;
   margin-inline: auto;
+  max-width: 100%; // never wider than the page, or there's nothing to center in
+  height: auto; // keep the aspect ratio when it shrinks
 }

@@ -12930,4 +12930,6 @@ body {
 .leaf__content img {
   display: block;
   margin-inline: auto;
+  max-width: 100%;
+  height: auto;
 }/*# sourceMappingURL=custom.css.map */
