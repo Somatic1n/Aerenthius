@@ -12966,10 +12966,12 @@ body {
     width: 100%;
     transform: none;
     transition: none;
+    pointer-events: none;
   }
   .leaf__face {
     transform: none;
     padding: 1.5em;
+    pointer-events: none;
     visibility: hidden;
     opacity: 0;
     transition: opacity 0.4s, visibility 0.4s;
@@ -12977,6 +12979,7 @@ body {
   .leaf .leaf__face.is-current {
     visibility: visible;
     opacity: 1;
+    transition: opacity 0.4s;
     pointer-events: auto;
   }
   .leaf__content {

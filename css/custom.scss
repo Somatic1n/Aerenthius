@@ -861,11 +861,17 @@ body {
     width: 100%;
     transform: none;
     transition: none;
+    // all the leaves are stacked full-size on top of each other, and an empty
+    // leaf still catches taps -- so a leaf higher in the stack would swallow
+    // every tap and swipe meant for the page on show. let them fall through;
+    // the current face turns them back on for itself below.
+    pointer-events: none;
   }
 
   .leaf__face {
     transform: none; // the back face is normally spun 180deg to face away
     padding: 1.5em;
+    pointer-events: none; // a page fading out can't be tapped
     visibility: hidden;
     opacity: 0;
     transition:
@@ -878,6 +884,9 @@ body {
   .leaf .leaf__face.is-current {
     visibility: visible;
     opacity: 1;
+    // fade in, but become visible (and tappable) at once -- otherwise a page
+    // counts as hidden for the whole fade and a quick second tap is lost
+    transition: opacity 0.4s;
     pointer-events: auto;
   }
 
