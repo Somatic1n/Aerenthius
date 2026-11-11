@@ -610,13 +610,18 @@ body {
   // the leaf sits on the right half, so its left edge is the spine. hinge
   // there, same as the old .page:last-child, so the outer edge tilts away.
   transform-origin: left center;
-  transform: rotateY(6deg);
+  // --lift nudges each leaf a hair toward the viewer according to its place in
+  // the stack (set by updateStacking in the script). Safari -- which is every
+  // browser on iPhone/iPad -- ignores z-index inside a 3D scene and sorts by
+  // real depth only, so without this all the leaves share one plane and bleed
+  // through each other. translateZ comes first so it's always "toward us".
+  transform: translateZ(var(--lift, 0px)) rotateY(6deg);
 }
 
 // turned over onto the left half. -180 would land it flat; the extra -6 makes
 // its outer edge dip away like the old .page:first-child tilt.
 .leaf.is-flipped {
-  transform: rotateY(-186deg);
+  transform: translateZ(var(--lift, 0px)) rotateY(-186deg);
 }
 
 .leaf__face {
@@ -790,6 +795,11 @@ body {
   // a thin, ink-colored scrollbar instead of the default grey one
   scrollbar-width: thin;
   scrollbar-color: #5a4632 transparent; // thumb, track
+
+  // iOS draws a scrolling box as its own layer, which can forget the face's
+  // backface-visibility and show the other side's text mirrored through it
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 .leaf__content img {

@@ -12772,11 +12772,11 @@ body {
   transform-style: preserve-3d;
   pointer-events: auto;
   transform-origin: left center;
-  transform: rotateY(6deg);
+  transform: translateZ(var(--lift, 0px)) rotateY(6deg);
 }
 
 .leaf.is-flipped {
-  transform: rotateY(-186deg);
+  transform: translateZ(var(--lift, 0px)) rotateY(-186deg);
 }
 
 .leaf__face {
@@ -12925,6 +12925,8 @@ body {
   padding-right: 0.75em;
   scrollbar-width: thin;
   scrollbar-color: #5a4632 transparent;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 .leaf__content img {
