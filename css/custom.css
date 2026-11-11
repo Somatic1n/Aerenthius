@@ -12509,7 +12509,7 @@ body:before {
   line-height: 1.5;
 }
 
-.open-book article *:not(.chapter-title):not(.contents-title):not(hr):not(dl) {
+.open-book article *:not(.chapter-title):not(.contents-title):not(hr):not(dl):not(img) {
   margin: 0 auto;
   max-width: none;
 }
@@ -12934,4 +12934,61 @@ body {
   margin-inline: auto;
   max-width: 100%;
   height: auto;
-}/*# sourceMappingURL=custom.css.map */
+}
+
+.leaf:first-child .leaf__face--front .wand-button-left,
+.leaf:last-of-type .leaf__face--back .wand-button-right {
+  display: none;
+}
+
+@media only screen and (min-width: 50em) {
+  .leaf__face--front .wand-button-left,
+  .leaf__face--back .wand-button-right {
+    display: none;
+  }
+}
+@media only screen and (max-width: 49.99em) {
+  .open-book {
+    position: relative;
+    margin: 1em;
+  }
+  .container {
+    height: calc(100vh - 6em);
+    height: calc(100dvh - 6em);
+    perspective: none;
+  }
+  .book {
+    transform-style: flat;
+  }
+  .leaf,
+  .leaf.is-flipped {
+    inset: 0;
+    width: 100%;
+    transform: none;
+    transition: none;
+  }
+  .leaf__face {
+    transform: none;
+    padding: 1.5em;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.4s, visibility 0.4s;
+  }
+  .leaf .leaf__face.is-current {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .leaf__content {
+    inset: 1.5em 1.5em 4.5em 1.5em;
+  }
+  .wand {
+    width: 6em;
+  }
+}
+@media only screen and (max-width: 49.99em) and (prefers-reduced-motion: reduce) {
+  .leaf__face {
+    transition: none;
+  }
+}
+/*# sourceMappingURL=custom.css.map */

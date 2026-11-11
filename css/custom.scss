@@ -278,7 +278,7 @@ body:before {
   line-height: 1.5;
 }
 
-.open-book article *:not(.chapter-title):not(.contents-title):not(hr):not(dl) {
+.open-book article *:not(.chapter-title):not(.contents-title):not(hr):not(dl):not(img) {
   margin: 0 auto;
   max-width: none;
 }
@@ -807,4 +807,91 @@ body {
   margin-inline: auto;
   max-width: 100%; // never wider than the page, or there's nothing to center in
   height: auto; // keep the aspect ratio when it shrinks
+}
+
+// ============================================================
+// Wands
+// ------------------------------------------------------------
+// every face carries both wands (the script adds them). there's no page
+// before the first one or after the last one, so those wands never show.
+// ============================================================
+.leaf:first-child .leaf__face--front .wand-button-left,
+.leaf:last-of-type .leaf__face--back .wand-button-right {
+  display: none;
+}
+
+// two-page spread: a right page (front) only turns forward, a left page
+// (back) only turns back
+@media only screen and (min-width: 50em) {
+  .leaf__face--front .wand-button-left,
+  .leaf__face--back .wand-button-right {
+    display: none;
+  }
+}
+
+// ============================================================
+// Single-page mode (phones, portrait tablets)
+// ------------------------------------------------------------
+// a two-page spread leaves each page ~150px wide on a phone, so below 50em
+// the book shows one face at a time, full width, and fades between them.
+// the 3D is switched off entirely -- nothing is rotated, so there's nothing
+// for Safari to mis-sort. the script marks the face on show with .is-current.
+// keep this max-width in step with `narrow` in the page script.
+// ============================================================
+@media only screen and (max-width: 49.99em) {
+  .open-book {
+    position: relative; // keep the page stack inside the book
+    margin: 1em;
+  }
+
+  .container {
+    height: calc(100vh - 6em); // older browsers
+    height: calc(100dvh - 6em); // the part of the screen actually visible on a phone
+    perspective: none;
+  }
+
+  .book {
+    transform-style: flat;
+  }
+
+  // every leaf (turned or not) lies flat and fills the book
+  .leaf,
+  .leaf.is-flipped {
+    inset: 0;
+    width: 100%;
+    transform: none;
+    transition: none;
+  }
+
+  .leaf__face {
+    transform: none; // the back face is normally spun 180deg to face away
+    padding: 1.5em;
+    visibility: hidden;
+    opacity: 0;
+    transition:
+      opacity 0.4s,
+      visibility 0.4s;
+  }
+
+  // listed after the pointer-events: none rule for turned leaves, so the page
+  // on show stays clickable even when its leaf counts as "turned"
+  .leaf .leaf__face.is-current {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .leaf__content {
+    inset: 1.5em 1.5em 4.5em 1.5em; // less margin on a small screen
+  }
+
+  .wand {
+    width: 6em;
+  }
+}
+
+@media only screen and (max-width: 49.99em) and (prefers-reduced-motion: reduce) {
+  .leaf__face {
+    transition: none;
+  }
 }
